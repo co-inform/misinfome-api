@@ -1,0 +1,197 @@
+openapi: '3.0.0'
+servers:
+- url: http://socsem.kmi.open.ac.uk/misinfo/
+  description: The deployment server
+info:
+  title: MisinfoMe API
+  version: '1.0'
+paths:
+  /credibility/sources/:
+    post:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/JobCreated'
+      description: Get the credibility of a certain source (for now just domain name)
+      operationId: get_source_credibility
+      parameters:
+        - in: query
+          name: source
+          description: The source to analyse
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: callback_url
+          description: A URL to be POSTed with the result of the job
+          schema:
+            type: string
+            format: url
+      tags:
+        - credibility
+  '/credibility/tweets/{tweet_id}':
+    parameters:
+      - in: path
+        description: 'The identifier of the tweet'
+        name: tweet_id
+        required: true
+        schema:
+          type: integer
+    post:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/JobCreated'
+      description: Get the credibility of a certain tweet
+      operationId: post_tweet_credibility
+      parameters:
+        - required: true
+          in: query
+          description: The query_id coming from the gateway
+          name: query_id
+          schema:
+            type: string
+      tags:
+        - credibility
+  /credibility/users/:
+    post:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/JobCreated'
+      operationId: post_twitter_user_credibility
+      parameters:
+        - schema:
+            type: string
+          required: true
+          in: query
+          description: The `screen_name` of the twitter profile to analyse
+          name: screen_name
+        - required: true
+          in: query
+          description: The query_id coming from the gateway
+          name: query_id
+          schema:
+            type: string
+      tags:
+        - credibility
+  '/jobs/status/{task_id}':
+    parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatus'
+      description: Get the statuses of the jobs
+      operationId: get_job_status
+      tags:
+        - jobs
+  '/jobs/status_by_callback_url/{callback_url}':
+    parameters:
+      - name: callback_url
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The callback_url that was sent from the gateway
+    get:
+      responses:
+        '200':
+          description: Success
+      description: Get the statuses of the job from the query_id
+      operationId: get_job_status_from_query_id
+      tags:
+        - jobs
+
+tags:
+  - name: credibility
+    description: Interfacing with the credibility component
+  - name: jobs
+    description: Query the status of the jobs
+components:
+  schemas:
+    JobCreated:
+      description: Information about a job that has been created
+      type: object
+      required:
+        - job_id
+      properties:
+        job_id:
+          description: an identifier of the job. You can use it to get the job status
+          type: string
+    JobStatus:
+      description: The status of a job that has been submitted. On completion it wraps a JobResult
+      type: object
+      required:
+        - state
+      properties:
+          state:
+            description: A description of what's going on with the job
+            type: string
+          result:
+            $ref: '#/components/schemas/JobResult'
+    JobResult:
+      description: The result of a job submission
+      oneOf:
+        - $ref: '#/components/schemas/TweetCredibility'
+        - $ref: '#/components/schemas/UserCredibility'
+        - $ref: '#/components/schemas/SourceCredibility'
+    TweetCredibility:
+      description: The credibility assigned to a tweet
+      type: object
+      required:
+        - credibility
+      properties:
+        credibility:
+          $ref: '#/components/schemas/Credibility'
+    UserCredibility:
+      description: The credibility assigned to a User (just twitter)
+      type: object
+      required:
+        - credibility
+      properties:
+        credibility:
+          $ref: '#/components/schemas/Credibility'
+    SourceCredibility:
+      description: The credibility assigned to a Source
+      type: object
+      required:
+        - credibility
+      properties:
+        credibility:
+          $ref: '#/components/schemas/Credibility'
+    Credibility:
+      type: object
+      required:
+        - value
+        - confidence
+      properties:
+          value:
+            type: number
+            format: float
+            minimum: -1.0
+            maximum: 1.0
+            description: The value
+          confidence:
+            type: number
+            format: float
+            minimum: 0.0
+            maximum: 1.0
+            description: The confidence of the credibility
