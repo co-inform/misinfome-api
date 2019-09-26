@@ -1,6 +1,6 @@
 openapi: '3.0.0'
 servers:
-- url: http://socsem.kmi.open.ac.uk/misinfo/
+- url: http://socsem.kmi.open.ac.uk/misinfo/api/
   description: The deployment server
 info:
   title: MisinfoMe API
@@ -9,7 +9,7 @@ info:
     Provides analysis of tweets, accounts and sources with respect to existing assessments
     that have been published online. These include fact-checks and other source-ratings.
 paths:
-  /credibility/sources/:
+  /credibility/sources:
     post:
       responses:
         '200':
@@ -19,7 +19,6 @@ paths:
                 schema:
                   $ref: '#/components/schemas/JobCreated'
       description: Get the credibility of a certain source (for now just domain name)
-      operationId: get_source_credibility
       parameters:
         - in: query
           name: source
@@ -52,17 +51,16 @@ paths:
                 schema:
                   $ref: '#/components/schemas/JobCreated'
       description: Get the credibility of a certain tweet
-      operationId: post_tweet_credibility
       parameters:
-        - required: true
-          in: query
-          description: The query_id coming from the gateway
-          name: query_id
+        - in: query
+          name: callback_url
+          description: A URL to be POSTed with the result of the job
           schema:
             type: string
+            format: url
       tags:
         - credibility
-  /credibility/users/:
+  /credibility/users:
     post:
       responses:
         '200':
@@ -71,7 +69,6 @@ paths:
             application/json:
                 schema:
                   $ref: '#/components/schemas/JobCreated'
-      operationId: post_twitter_user_credibility
       parameters:
         - schema:
             type: string
@@ -79,12 +76,12 @@ paths:
           in: query
           description: The `screen_name` of the twitter profile to analyse
           name: screen_name
-        - required: true
-          in: query
-          description: The query_id coming from the gateway
-          name: query_id
+        - in: query
+          name: callback_url
+          description: A URL to be POSTed with the result of the job
           schema:
             type: string
+            format: url
       tags:
         - credibility
   '/jobs/status/{task_id}':
@@ -103,7 +100,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobStatus'
       description: Get the statuses of the jobs
-      operationId: get_job_status
       tags:
         - jobs
   '/jobs/status_by_callback_url/{callback_url}':
@@ -118,8 +114,7 @@ paths:
       responses:
         '200':
           description: Success
-      description: Get the statuses of the job from the query_id
-      operationId: get_job_status_from_query_id
+      description: Get the statuses of the job from the callback_url
       tags:
         - jobs
 
