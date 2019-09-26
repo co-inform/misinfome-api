@@ -2,6 +2,8 @@ openapi: '3.0.0'
 servers:
 - url: http://socsem.kmi.open.ac.uk/misinfo/api/
   description: The deployment server
+- url: http://localhost:5000/misinfo/api
+  description: localhost
 info:
   title: MisinfoMe API
   version: '0.1.0'
@@ -17,7 +19,7 @@ paths:
           content:
             application/json:
                 schema:
-                  $ref: '#/components/schemas/JobCreated'
+                  $ref: '#/components/schemas/SourceAnalysisResult'
       description: Get the credibility of a certain source (for now just domain name)
       parameters:
         - in: query
@@ -28,7 +30,7 @@ paths:
             type: string
         - in: query
           name: callback_url
-          description: A URL to be POSTed with the result of the job
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu/ for validation)
           schema:
             type: string
             format: url
@@ -49,12 +51,12 @@ paths:
           content:
             application/json:
                 schema:
-                  $ref: '#/components/schemas/JobCreated'
+                  $ref: '#/components/schemas/TweetAnalysisResult'
       description: Get the credibility of a certain tweet
       parameters:
         - in: query
           name: callback_url
-          description: A URL to be POSTed with the result of the job
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu/ for validation)
           schema:
             type: string
             format: url
@@ -68,7 +70,7 @@ paths:
           content:
             application/json:
                 schema:
-                  $ref: '#/components/schemas/JobCreated'
+                  $ref: '#/components/schemas/UserAnalysisResult'
       parameters:
         - schema:
             type: string
@@ -78,15 +80,15 @@ paths:
           name: screen_name
         - in: query
           name: callback_url
-          description: A URL to be POSTed with the result of the job
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu/ for validation)
           schema:
             type: string
             format: url
       tags:
         - credibility
-  '/jobs/status/{task_id}':
+  '/jobs/status/{job_id}':
     parameters:
-      - name: task_id
+      - name: job_id
         in: path
         required: true
         schema:
@@ -102,10 +104,10 @@ paths:
       description: Get the statuses of the jobs
       tags:
         - jobs
-  '/jobs/status_by_callback_url/{callback_url}':
+  '/jobs/status_by_callback_url':
     parameters:
       - name: callback_url
-        in: path
+        in: query
         required: true
         schema:
           type: string
@@ -114,13 +116,21 @@ paths:
       responses:
         '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatus'
       description: Get the statuses of the job from the callback_url
       tags:
         - jobs
 
 tags:
   - name: credibility
-    description: Interfacing with the credibility component
+    description: >-
+      Interfacing with the credibility component.
+
+      If `callback_url` is provided, the result is a `JobCreated` object.
+      If `callback_url` is not provided, the result is a `SourceCredibility` object.
   - name: jobs
     description: Query the status of the jobs
 components:
@@ -193,3 +203,27 @@ components:
             minimum: 0.0
             maximum: 1.0
             description: The confidence of the credibility
+    TweetAnalysisResult:
+      description: >-
+        The result of a call of a tweet analysis. It depends on the presence of `callback_url` or not.
+        If `callback_url` is provided, the result is a JobCreated object.
+        If `callback_url` is not provided, the result is a `TweetCredibility` object.
+      oneOf:
+        - $ref: '#/components/schemas/TweetCredibility'
+        - $ref: '#/components/schemas/JobCreated'
+    UserAnalysisResult:
+      description: >-
+        The result of a call of a twitter profile analysis. It depends on the presence of `callback_url` or not.
+        If `callback_url` is provided, the result is a JobCreated object.
+        If `callback_url` is not provided, the result is a `UserCredibility` object.
+      oneOf:
+        - $ref: '#/components/schemas/UserCredibility'
+        - $ref: '#/components/schemas/JobCreated'
+    SourceAnalysisResult:
+      description: >-
+        The result of a call of a source analysis. It depends on the presence of `callback_url` or not.
+        If `callback_url` is provided, the result is a `JobCreated` object.
+        If `callback_url` is not provided, the result is a `SourceCredibility` object.
+      oneOf:
+        - $ref: '#/components/schemas/SourceCredibility'
+        - $ref: '#/components/schemas/JobCreated'
