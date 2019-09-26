@@ -4,7 +4,10 @@ servers:
   description: The deployment server
 info:
   title: MisinfoMe API
-  version: '1.0'
+  version: '0.1.0'
+  description: >-
+    Provides analysis of tweets, accounts and sources with respect to existing assessments
+    that have been published online. These include fact-checks and other source-ratings.
 paths:
   /credibility/sources/:
     post:
