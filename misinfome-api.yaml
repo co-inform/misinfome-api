@@ -2,8 +2,8 @@ openapi: '3.0.0'
 servers:
 - url: https://socsem.kmi.open.ac.uk/misinfo/api/
   description: The deployment server
-- url: https://misinfo.me/api/
-  description: test in progress
+- url: https://misinfo.me/misinfo/api/
+  description: The deployment with the custom domain
 - url: http://localhost:5000/misinfo/api
   description: localhost
 info:
