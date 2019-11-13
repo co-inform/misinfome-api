@@ -125,6 +125,25 @@ paths:
       description: Get the statuses of the job from the callback_url
       tags:
         - jobs
+  '/utils/unshorten':
+    parameters:
+      - name: url
+        in: query
+        required: true
+        schema:
+          type: string
+        description: The URL to unshorten
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UrlUnshortenedResult'
+      description: Get the full URL for common shortening domains (bit.ly / t.co / ...)
+      tags:
+        - utils
 
 tags:
   - name: credibility
@@ -135,6 +154,8 @@ tags:
       If `callback_url` is not provided, the result is a `SourceCredibility` object.
   - name: jobs
     description: Query the status of the jobs
+  - name: utils
+    description: Utilities
 components:
   schemas:
     JobCreated:
@@ -229,3 +250,20 @@ components:
       oneOf:
         - $ref: '#/components/schemas/SourceCredibility'
         - $ref: '#/components/schemas/JobCreated'
+    UrlUnshortenedResult:
+      description: >-
+        The result of a call to the unshortening endpoint. It provides the URL unshortened in the field `url_full`
+      type: object
+      required:
+        - url
+        - url_full
+      properties:
+          url:
+            type: string
+            description: The requested URL
+          url_full:
+            type: string
+            format: uri
+            minimum: 0.0
+            maximum: 1.0
+            description: The unshortened URL
