@@ -1,0 +1,356 @@
+openapi: 3.0.1
+
+info:
+  title: ClaimID - Claim IDentification/Embedding API
+  description: >
+    ClaimID extract claims from textual documents and generate 
+    claim embeddings that can be used for identifying claims 
+    on different types of content.
+  version: "0.1.0"
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /embedding:
+    get:
+      summary: Get the claim embedding associated with a given sentence.
+      operationId: claimid.api.embedding.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmbeddingResponse"
+      parameters:
+        - name: text
+          in: query
+          description: The sentence that needs to be embedded.
+          required: true
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Sentence Embedding
+
+    post:
+      summary: Get the claim embeddings associated with a list of sentences.
+      operationId: claimid.api.embedding.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmbeddingsListResponse"
+      requestBody:
+        description: The list of sentences that needs to be embedded.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      parameters:
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Sentence Embedding
+
+  /identify:
+    get:
+      summary: Identifies if a given sentence is a claim.
+      operationId: claimid.api.identify.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResponse"
+      parameters:
+        - name: text
+          in: query
+          description: The sentence that needs to be checked.
+          required: true
+          schema:
+            type: string
+        - name: return_embeddings
+          in: query
+          description: If set, returns the sentence embedding.
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Identification
+
+    post:
+      summary: Identify claims in a list of sentences.
+      operationId: claimid.api.identify.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimsListResponse"
+      requestBody:
+        description: The list of sentences that needs to be checked.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      parameters:
+        - name: return_embeddings
+          in: query
+          description: If set, returns each sentence embedding.
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Identification
+
+  /extract:
+    get:
+      summary: Extract claims from text or a URL.
+      operationId: claimid.api.extract.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractsListResponse"
+      parameters:
+        - name: text
+          in: query
+          description: The text that needs to be analysed (cannot be set if the url parameter is used).
+          schema:
+            type: string
+        - name: url
+          in: query
+          description: The url that needs to be analysed (cannot be set if the text parameter is used).
+          schema:
+            type: string
+            format: url
+        - name: return_embeddings
+          in: query
+          description: If set, returns the sentence embedding.
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Extraction
+    post:
+      summary: Extract claims from text or a URL.
+      operationId: claimid.api.extract.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractsListResponse"
+      requestBody:
+        description: The text that needs to be analysed (cannot be set if the url parameter is used).
+        content:
+          application/json:
+            schema:
+              type: string
+          text/plain:
+            schema:
+              type: string
+      parameters:
+        - name: url
+          in: query
+          description: The url that needs to be analysed (cannot be set if a request body is used).
+          schema:
+            type: string
+            format: url
+        - name: return_embeddings
+          in: query
+          description: If set, returns the sentence embedding.
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Claim Extraction
+tags:
+  - name: Claim Sentence Embedding
+    description: Obtain embedding representation of sentences.
+  - name: Claim Identification
+    description: Identify if a sentence is a claim.
+  - name: Claim Extraction
+    description: Extract claims from text.
+
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        status:
+          description: Identifies if the query was successful.
+          type: string
+          enum: [success, fail, error]
+        data:
+          description: The response payload.
+          nullable: true
+        message:
+          description: Explains the response status.
+          type: string
+          nullable: true
+      required:
+        - status
+
+    Embedding:
+      description: An embedding representation.
+      type: array
+      items:
+        type: number
+
+    EmbeddingResponse:
+      description: A sentence claim embedding.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Embedding"
+
+    EmbeddingsListResponse:
+      description: A list of sentence claim embedding.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: An list of embedding representation.
+              type: array
+              items:
+                $ref: "#/components/schemas/Embedding"
+
+    Claim:
+      description: An claim representation.
+      type: object
+      properties:
+        label:
+          description: Identifies if a sentence is a claim.
+          type: string
+          enum: [claim, not_claim]
+        probabilities:
+          description: Show probabilities of being a claim or not a claim.
+          type: object
+          properties:
+            claim:
+              description: Probability of being a claim.
+              type: number
+              minimum: 0
+              maximum: 1
+            not_claim:
+              description: Probability of not being a claim.
+              type: number
+              minimum: 0
+              maximum: 1
+        embedding:
+          description: If requested, the embedding representation of the claim.
+          type: array
+          items:
+            type: number
+          nullable: true
+
+    ClaimResponse:
+      description: Identifies if a sentence is a claim.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Claim"
+
+    ClaimsListResponse:
+      description: Identifies the claims in a list of sentences.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: A list identifying if sentences are claims.
+              type: array
+              items:
+                $ref: "#/components/schemas/Claim"
+
+    Extract:
+      description: An extract representation.
+      allOf:
+        - $ref: "#/components/schemas/Claim"
+        - type: object
+          properties:
+            sentence:
+              description: The analysed sentence (may be tokenized).
+              type: string
+            offsets:
+              description: The start and end positiojn of the sentence in the original text.
+              type: array
+              items:
+                type: integer
+                minimum: 0
+              minItems: 2
+              maxItems: 2
+            index:
+              description: The sentence index (position within the returned sentences list).
+              type: integer
+              minimum: 0
+
+    ExtractsListResponse:
+      description: Extract the claims in a text.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: A list identifying if sentences extracted.
+              type: array
+              items:
+                $ref: "#/components/schemas/Extract"
