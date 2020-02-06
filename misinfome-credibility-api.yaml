@@ -13,7 +13,7 @@ paths:
   /credibility/assessor:
     get:
       summary: Get the credibility of a given assessor (forwards to /credibility/publisher).
-      operationId: credibility.api.assessor.get
+      operationId: credibility.api.credibility.assessor.get
       responses:
         200:
           description: Successful operation.
@@ -44,7 +44,7 @@ paths:
 
     post:
       summary: Get the credibility of a given assessor (forwards to /credibility/publisher).
-      operationId: credibility.api.assessor.post
+      operationId: credibility.api.credibility.assessor.post
       responses:
         200:
           description: Successful operation.
@@ -76,7 +76,7 @@ paths:
   /credibility/agent:
     get:
       summary: Get the credibility of a given agent (e.g., Twitter account, author, tool, etc.).
-      operationId: credibility.api.agent.get
+      operationId: credibility.api.credibility.agent.get
       responses:
         200:
           description: Successful operation.
@@ -107,7 +107,7 @@ paths:
 
     post:
       summary: Get the credibility of a given agent (e.g., Twitter account, author, tool, etc.).
-      operationId: credibility.api.agent.post
+      operationId: credibility.api.credibility.agent.post
       responses:
         200:
           description: Successful operation.
@@ -139,7 +139,7 @@ paths:
   /credibility/publisher:
     get:
       summary: Get the credibility of a given publisher.
-      operationId: credibility.api.publisher.get
+      operationId: credibility.api.credibility.publisher.get
       responses:
         200:
           description: Successful operation.
@@ -170,7 +170,7 @@ paths:
 
     post:
       summary: Get the credibility of a given publisher.
-      operationId: credibility.api.publisher.post
+      operationId: credibility.api.credibility.publisher.post
       responses:
         200:
           description: Successful operation.
@@ -202,7 +202,7 @@ paths:
   /credibility/document:
     get:
       summary: Get the credibility of a given document (for URL or for a textual input).
-      operationId: credibility.api.document.get
+      operationId: credibility.api.credibility.document.get
       responses:
         200:
           description: Successful operation.
@@ -213,27 +213,20 @@ paths:
       parameters:
         - name: url
           in: query
-          description: The url that links to the content that needs to be analysed (when not set, the content parameter needs to be set).
-          required: false
+          description: The url that links to the content that needs to be analysed.
+          required: true
           schema:
             type: string
-        - name: content
-          in: query
-          description: The content that needs to be analysed (if used, the content of url is not fetched and the content parameter is used instead).
-          required: false
-          schema:
-            type: string
-
         - name: agent
           in: query
-          description: The agent url associated with the document that needs to be evaluated (infered if not set and if url paramet is present).
+          description: The agent url associated with the document that needs to be evaluated (infered if not set).
           required: false
           schema:
             type: string
 
         - name: publisher
           in: query
-          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set and if url paramet is present).
+          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set).
           required: false
           schema:
             type: string
@@ -253,7 +246,7 @@ paths:
 
     post:
       summary: Get the credibility of a given document (for URL or for a textual input).
-      operationId: credibility.api.document.post
+      operationId: credibility.api.credibility.document.post
       responses:
         200:
           description: Successful operation.
@@ -264,28 +257,19 @@ paths:
       parameters:
         - name: url
           in: query
-          description: The url that links to the content that needs to be analysed (when not set, the content parameter needs to be set).
-          required: false
+          description: The url that links to the content that needs to be analysed.
+          required: true
           schema:
             type: string
-
-        - name: content
-          in: query
-          description: The content that needs to be analysed (if used, the content of url is not fetched and the content parameter is used instead).
-          required: false
-          schema:
-            type: string
-
         - name: agent
           in: query
-          description: The agent url associated with the document that needs to be evaluated (infered if not set and if url paramet is present).
+          description: The agent url associated with the document that needs to be evaluated (infered if not set).
           required: false
           schema:
             type: string
-
         - name: publisher
           in: query
-          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set and if url paramet is present).
+          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set).
           required: false
           schema:
             type: string
@@ -317,6 +301,7 @@ paths:
       tags:
         - Credibility Rulesets
     post:
+      operationId: credibility.api.rulesets.post
       summary: Create a new credibility ruleset.
       requestBody:
         description: The ruleset content.
@@ -331,7 +316,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RulesetResponse"
+                $ref: "#/components/schemas/RulesetListResponse"
       tags:
         - Credibility Rulesets
 
@@ -424,9 +409,12 @@ paths:
           schema:
             type: string
             enum:
+              - queued
               - finished
-              - processing
               - failed
+              - started
+              - deferred
+              - scheduled
         - name: callback_url
           in: query
           description: Filter the jobs by callback_url.
@@ -562,15 +550,26 @@ components:
         status:
           type: string
           enum:
+            - queued
             - finished
             - failed
-            - processing
+            - started
+            - deferred
+            - scheduled
         progress:
           description: The progress of the computation.
           type: number
           minimum: 0
           maximum: 1
           nullable: true
+        query_type:
+          type: string
+          enum:
+            - /credibility/assessor
+            - /credibility/agent
+            - /credibility/publisher
+            - /credibility/document
+            - /rulesets
         result:
           $ref: "#/components/schemas/CredibilityResponse"
         callback_url:
@@ -650,6 +649,7 @@ components:
           enum:
             - legacy
             - graph
+        #   default: graph
         initialisers:
           type: array
           items:
@@ -664,7 +664,7 @@ components:
               $ref: "#/components/schemas/ParametrisedMergeRule"
             publisher:
               $ref: "#/components/schemas/ParametrisedMergeRule"
-            author:
+            agent:
               $ref: "#/components/schemas/ParametrisedMergeRule"
             document:
               $ref: "#/components/schemas/ParametrisedMergeRule"
@@ -695,7 +695,7 @@ components:
         - type: object
           properties:
             data:
-              description: An list of job rulesets.
+              description: A list of job rulesets.
               type: array
               items:
                 $ref: "#/components/schemas/RulesetDefinition"
