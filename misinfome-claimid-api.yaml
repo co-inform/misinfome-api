@@ -22,7 +22,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmbeddingResponse"
+                $ref: '#/components/schemas/EmbeddingResponse'
       parameters:
         - name: text
           in: query
@@ -30,12 +30,6 @@ paths:
           required: true
           schema:
             type: string
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
       tags:
         - Claim Sentence Embedding
 
@@ -48,7 +42,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmbeddingsListResponse"
+                $ref: '#/components/schemas/EmbeddingsListResponse'
       requestBody:
         description: The list of sentences that needs to be embedded.
         required: true
@@ -58,13 +52,6 @@ paths:
               type: array
               items:
                 type: string
-      parameters:
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
       tags:
         - Claim Sentence Embedding
 
@@ -78,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ClaimResponse"
+                $ref: '#/components/schemas/ClaimResponse'
       parameters:
         - name: text
           in: query
@@ -93,12 +80,6 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
       tags:
         - Claim Identification
 
@@ -111,7 +92,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ClaimsListResponse"
+                $ref: '#/components/schemas/ClaimsListResponse'
       requestBody:
         description: The list of sentences that needs to be checked.
         required: true
@@ -129,101 +110,14 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
       tags:
         - Claim Identification
 
-  /extract:
-    get:
-      summary: Extract claims from text or a URL.
-      operationId: claimid.api.extract.get
-      responses:
-        200:
-          description: Successful operation.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExtractsListResponse"
-      parameters:
-        - name: text
-          in: query
-          description: The text that needs to be analysed (cannot be set if the url parameter is used).
-          schema:
-            type: string
-        - name: url
-          in: query
-          description: The url that needs to be analysed (cannot be set if the text parameter is used).
-          schema:
-            type: string
-            format: url
-        - name: return_embeddings
-          in: query
-          description: If set, returns the sentence embedding.
-          schema:
-            type: boolean
-            default: false
-          allowEmptyValue: true
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
-      tags:
-        - Claim Extraction
-    post:
-      summary: Extract claims from text or a URL.
-      operationId: claimid.api.extract.post
-      responses:
-        200:
-          description: Successful operation.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExtractsListResponse"
-      requestBody:
-        description: The text that needs to be analysed (cannot be set if the url parameter is used).
-        content:
-          application/json:
-            schema:
-              type: string
-          text/plain:
-            schema:
-              type: string
-      parameters:
-        - name: url
-          in: query
-          description: The url that needs to be analysed (cannot be set if a request body is used).
-          schema:
-            type: string
-            format: url
-        - name: return_embeddings
-          in: query
-          description: If set, returns the sentence embedding.
-          schema:
-            type: boolean
-            default: false
-          allowEmptyValue: true
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
-      tags:
-        - Claim Extraction
 tags:
   - name: Claim Sentence Embedding
     description: Obtain embedding representation of sentences.
   - name: Claim Identification
     description: Identify if a sentence is a claim.
-  - name: Claim Extraction
-    description: Extract claims from text.
 
 components:
   schemas:
@@ -251,7 +145,8 @@ components:
         type: number
 
     EmbeddingResponse:
-      description: A sentence claim embedding.
+      description:
+        A sentence claim embedding.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -260,7 +155,8 @@ components:
               $ref: "#/components/schemas/Embedding"
 
     EmbeddingsListResponse:
-      description: A list of sentence claim embedding.
+      description:
+        A list of sentence claim embedding.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -279,20 +175,6 @@ components:
           description: Identifies if a sentence is a claim.
           type: string
           enum: [claim, not_claim]
-        probabilities:
-          description: Show probabilities of being a claim or not a claim.
-          type: object
-          properties:
-            claim:
-              description: Probability of being a claim.
-              type: number
-              minimum: 0
-              maximum: 1
-            not_claim:
-              description: Probability of not being a claim.
-              type: number
-              minimum: 0
-              maximum: 1
         embedding:
           description: If requested, the embedding representation of the claim.
           type: array
@@ -301,7 +183,8 @@ components:
           nullable: true
 
     ClaimResponse:
-      description: Identifies if a sentence is a claim.
+      description:
+        Identifies if a sentence is a claim.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -310,7 +193,8 @@ components:
               $ref: "#/components/schemas/Claim"
 
     ClaimsListResponse:
-      description: Identifies the claims in a list of sentences.
+      description:
+        Identifies the claims in a list of sentences.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -320,6 +204,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Claim"
+
 
     Extract:
       description: An extract representation.
@@ -344,7 +229,8 @@ components:
               minimum: 0
 
     ExtractsListResponse:
-      description: Extract the claims in a text.
+      description:
+        Extract the claims in a text.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
