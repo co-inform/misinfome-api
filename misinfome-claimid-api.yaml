@@ -12,17 +12,17 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 
 paths:
-  /embedding:
+  /claimid/embedding:
     get:
       summary: Get the claim embedding associated with a given sentence.
-      operationId: claimid.api.embedding.get
+      operationId: claimid.api.claimid.embedding.get
       responses:
         200:
           description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmbeddingResponse'
+                $ref: "#/components/schemas/EmbeddingResponse"
       parameters:
         - name: text
           in: query
@@ -30,19 +30,25 @@ paths:
           required: true
           schema:
             type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
       tags:
         - Claim Sentence Embedding
 
     post:
       summary: Get the claim embeddings associated with a list of sentences.
-      operationId: claimid.api.embedding.post
+      operationId: claimid.api.claimid.embedding.post
       responses:
         200:
           description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmbeddingsListResponse'
+                $ref: "#/components/schemas/EmbeddingsListResponse"
       requestBody:
         description: The list of sentences that needs to be embedded.
         required: true
@@ -52,20 +58,27 @@ paths:
               type: array
               items:
                 type: string
+      parameters:
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
       tags:
         - Claim Sentence Embedding
 
-  /identify:
+  /claimid/identify:
     get:
       summary: Identifies if a given sentence is a claim.
-      operationId: claimid.api.identify.get
+      operationId: claimid.api.claimid.identify.get
       responses:
         200:
           description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimResponse'
+                $ref: "#/components/schemas/ClaimResponse"
       parameters:
         - name: text
           in: query
@@ -80,19 +93,25 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
       tags:
         - Claim Identification
 
     post:
       summary: Identify claims in a list of sentences.
-      operationId: claimid.api.identify.post
+      operationId: claimid.api.claimid.identify.post
       responses:
         200:
           description: Successful operation.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimsListResponse'
+                $ref: "#/components/schemas/ClaimsListResponse"
       requestBody:
         description: The list of sentences that needs to be checked.
         required: true
@@ -110,14 +129,89 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
       tags:
         - Claim Identification
+
+  /jobs/statuses:
+    get:
+      summary: Get the list of running and completed jobs.
+      operationId: claimid.api.jobs.statuses.get_all
+      parameters:
+        - name: query_type
+          in: query
+          description: Filter the jobs by the type of query.
+          required: false
+          schema:
+            type: string
+            enum:
+              - /claimid/identify
+              - /claimid/embedding
+        - name: status
+          in: query
+          description: Filter the jobs byt their status.
+          required: false
+          schema:
+            type: string
+            enum:
+              - queued
+              - finished
+              - failed
+              - started
+              - deferred
+              - scheduled
+        - name: callback_url
+          in: query
+          description: Filter the jobs by callback_url.
+          required: false
+          schema:
+            type: string
+            format: url
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatusListResponse"
+      tags:
+        - Jobs
+
+  /jobs/statuses/{job_id}:
+    get:
+      summary: Get the status of a given job.
+      operationId: claimid.api.jobs.statuses.get
+      parameters:
+        - name: job_id
+          description: The identifier of the job that needs to be retreived.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatusResponse"
+      tags:
+        - Jobs
 
 tags:
   - name: Claim Sentence Embedding
     description: Obtain embedding representation of sentences.
   - name: Claim Identification
     description: Identify if a sentence is a claim.
+  #  - name: Claim Extraction
+  #    description: Extract claims from text.
+  - name: Jobs
+    description: Obtain processing status for a query.
 
 components:
   schemas:
@@ -145,8 +239,7 @@ components:
         type: number
 
     EmbeddingResponse:
-      description:
-        A sentence claim embedding.
+      description: A sentence claim embedding.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -155,8 +248,7 @@ components:
               $ref: "#/components/schemas/Embedding"
 
     EmbeddingsListResponse:
-      description:
-        A list of sentence claim embedding.
+      description: A list of sentence claim embedding.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -175,6 +267,17 @@ components:
           description: Identifies if a sentence is a claim.
           type: string
           enum: [claim, not_claim]
+        label_probs:
+          type: object
+          properties:
+            claim:
+              type: number
+              minimum: 0
+              maximum: 1
+            not_claim:
+              type: number
+              minimum: 0
+              maximum: 1
         embedding:
           description: If requested, the embedding representation of the claim.
           type: array
@@ -183,8 +286,7 @@ components:
           nullable: true
 
     ClaimResponse:
-      description:
-        Identifies if a sentence is a claim.
+      description: Identifies if a sentence is a claim.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -193,8 +295,7 @@ components:
               $ref: "#/components/schemas/Claim"
 
     ClaimsListResponse:
-      description:
-        Identifies the claims in a list of sentences.
+      description: Identifies the claims in a list of sentences.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -204,7 +305,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Claim"
-
 
     Extract:
       description: An extract representation.
@@ -229,8 +329,7 @@ components:
               minimum: 0
 
     ExtractsListResponse:
-      description:
-        Extract the claims in a text.
+      description: Extract the claims in a text.
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
@@ -240,3 +339,54 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Extract"
+
+    JobStatus:
+      description: A job status.
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - queued
+            - finished
+            - failed
+            - started
+            - deferred
+            - scheduled
+        progress:
+          description: The progress of the computation.
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        query_type:
+          type: string
+          enum:
+            - /claimid/identify
+            - /claimid/embedding
+        result:
+          $ref: "#/components/schemas/Response"
+        callback_url:
+          type: string
+          format: url
+
+    JobStatusResponse:
+      description: A job status response.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/JobStatus"
+
+    JobStatusListResponse:
+      description: A list of Job statuses.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: An list of job statuses.
+              type: array
+              items:
+                $ref: "#/components/schemas/JobStatus"
