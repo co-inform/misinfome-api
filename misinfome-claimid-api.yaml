@@ -23,19 +23,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmbeddingResponse"
-      parameters:
-        - name: text
-          in: query
-          description: The sentence that needs to be embedded.
-          required: true
-          schema:
-            type: string
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
       tags:
         - Claim Sentence Embedding
 
@@ -50,21 +37,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/EmbeddingsListResponse"
       requestBody:
-        description: The list of sentences that needs to be embedded.
+        description: A JSON object specifying the embedding query.
         required: true
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-      parameters:
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
+              type: object
+              properties:
+                sentences:
+                  description: A list of sentence that needs to be embedded.
+                  type: array
+                  items:
+                    type: string
+                callback_url:
+                  description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+                  type: string
+                  format: url
+                  default: null
+              required:
+                - sentences
       tags:
         - Claim Sentence Embedding
 
@@ -113,28 +104,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/ClaimsListResponse"
       requestBody:
-        description: The list of sentences that needs to be checked.
+        description: A JSON object specifying the embedding query.
         required: true
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-      parameters:
-        - name: return_embeddings
-          in: query
-          description: If set, returns each sentence embedding.
-          schema:
-            type: boolean
-            default: false
-          allowEmptyValue: true
-        - name: callback_url
-          in: query
-          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
-          schema:
-            type: string
-            format: url
+              type: object
+              properties:
+                sentences:
+                  description: A list of sentence that needs to be embedded.
+                  type: array
+                  items:
+                    type: string
+                callback_url:
+                  description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+                  type: string
+                  format: url
+                  default: null
+                return_embeddings:
+                  description: If set, returns each sentence embedding.
+                  type: boolean
+                  default: false
+              required:
+                - sentences
       tags:
         - Claim Identification
 
