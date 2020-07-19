@@ -145,7 +145,7 @@ paths:
       tags:
         - utils
 
-"/utils/status":
+  "/utils/status":
     get:
       responses:
         "200":
@@ -290,7 +290,7 @@ components:
       properties:
         status:
           type: string
-          description: `ok` if everything is ok, or `error` / `exception` if something is wrong
+          description: The string `ok` if everything is ok, or `error` / `exception` if something is wrong
         details:
           type: object
           description: The status of the components
