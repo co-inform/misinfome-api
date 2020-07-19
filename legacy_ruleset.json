@@ -1,0 +1,7 @@
+{
+    "author": "evhart/credibility",
+    "description": "The legacy credibility ruleset.",
+    "model": "legacy",
+    "name": "legacy",
+    "version": "0.1"
+}

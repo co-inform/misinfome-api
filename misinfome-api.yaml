@@ -1,14 +1,14 @@
-openapi: '3.0.0'
+openapi: "3.0.0"
 servers:
-- url: https://socsem.kmi.open.ac.uk/misinfo/api/
-  description: The deployment server
-- url: https://misinfo.me/misinfo/api/
-  description: The deployment with the custom domain
-- url: http://localhost:5000/misinfo/api
-  description: localhost
+  - url: https://socsem.kmi.open.ac.uk/misinfo/api/
+    description: The deployment server
+  - url: https://misinfo.me/misinfo/api/
+    description: The deployment with the custom domain
+  - url: http://localhost:5000/misinfo/api
+    description: localhost
 info:
   title: MisinfoMe API
-  version: '0.1.0'
+  version: "0.1.0"
   description: >-
     Provides analysis of tweets, accounts and sources with respect to existing assessments
     that have been published online. These include fact-checks and other source-ratings.
@@ -16,12 +16,12 @@ paths:
   /credibility/sources:
     post:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
-                schema:
-                  $ref: '#/components/schemas/SourceAnalysisResult'
+              schema:
+                $ref: "#/components/schemas/SourceAnalysisResult"
       description: Get the credibility of a certain source (for now just domain name)
       parameters:
         - in: query
@@ -38,22 +38,22 @@ paths:
             format: url
       tags:
         - credibility
-  '/credibility/tweets/{tweet_id}':
+  "/credibility/tweets/{tweet_id}":
     parameters:
       - in: path
-        description: 'The identifier of the tweet'
+        description: "The identifier of the tweet"
         name: tweet_id
         required: true
         schema:
           type: integer
     post:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
-                schema:
-                  $ref: '#/components/schemas/TweetAnalysisResult'
+              schema:
+                $ref: "#/components/schemas/TweetAnalysisResult"
       description: Get the credibility of a certain tweet
       parameters:
         - in: query
@@ -67,12 +67,12 @@ paths:
   /credibility/users:
     post:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
-                schema:
-                  $ref: '#/components/schemas/UserAnalysisResult'
+              schema:
+                $ref: "#/components/schemas/UserAnalysisResult"
       parameters:
         - schema:
             type: string
@@ -88,7 +88,7 @@ paths:
             format: url
       tags:
         - credibility
-  '/jobs/status/{job_id}':
+  "/jobs/status/{job_id}":
     parameters:
       - name: job_id
         in: path
@@ -97,16 +97,16 @@ paths:
           type: string
     get:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JobStatus'
+                $ref: "#/components/schemas/JobStatus"
       description: Get the statuses of the jobs
       tags:
         - jobs
-  '/jobs/status_by_callback_url':
+  "/jobs/status_by_callback_url":
     parameters:
       - name: callback_url
         in: query
@@ -116,16 +116,16 @@ paths:
         description: The callback_url that was sent from the gateway
     get:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JobStatus'
+                $ref: "#/components/schemas/JobStatus"
       description: Get the statuses of the job from the callback_url
       tags:
         - jobs
-  '/utils/unshorten':
+  "/utils/unshorten":
     parameters:
       - name: url
         in: query
@@ -135,13 +135,26 @@ paths:
         description: The URL to unshorten
     get:
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UrlUnshortenedResult'
+                $ref: "#/components/schemas/UrlUnshortenedResult"
       description: Get the full URL for common shortening domains (bit.ly / t.co / ...)
+      tags:
+        - utils
+
+"/utils/status":
+    get:
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResult"
+      description: Get the health status of the service to know if everything is working properly
       tags:
         - utils
 
@@ -173,17 +186,17 @@ components:
       required:
         - state
       properties:
-          state:
-            description: A description of what's going on with the job
-            type: string
-          result:
-            $ref: '#/components/schemas/JobResult'
+        state:
+          description: A description of what's going on with the job
+          type: string
+        result:
+          $ref: "#/components/schemas/JobResult"
     JobResult:
       description: The result of a job submission
       oneOf:
-        - $ref: '#/components/schemas/TweetCredibility'
-        - $ref: '#/components/schemas/UserCredibility'
-        - $ref: '#/components/schemas/SourceCredibility'
+        - $ref: "#/components/schemas/TweetCredibility"
+        - $ref: "#/components/schemas/UserCredibility"
+        - $ref: "#/components/schemas/SourceCredibility"
     TweetCredibility:
       description: The credibility assigned to a tweet
       type: object
@@ -191,7 +204,7 @@ components:
         - credibility
       properties:
         credibility:
-          $ref: '#/components/schemas/Credibility'
+          $ref: "#/components/schemas/Credibility"
     UserCredibility:
       description: The credibility assigned to a User (just twitter)
       type: object
@@ -199,7 +212,7 @@ components:
         - credibility
       properties:
         credibility:
-          $ref: '#/components/schemas/Credibility'
+          $ref: "#/components/schemas/Credibility"
     SourceCredibility:
       description: The credibility assigned to a Source
       type: object
@@ -207,49 +220,49 @@ components:
         - credibility
       properties:
         credibility:
-          $ref: '#/components/schemas/Credibility'
+          $ref: "#/components/schemas/Credibility"
     Credibility:
       type: object
       required:
         - value
         - confidence
       properties:
-          value:
-            type: number
-            format: float
-            minimum: -1.0
-            maximum: 1.0
-            description: The value
-          confidence:
-            type: number
-            format: float
-            minimum: 0.0
-            maximum: 1.0
-            description: The confidence of the credibility
+        value:
+          type: number
+          format: float
+          minimum: -1.0
+          maximum: 1.0
+          description: The value
+        confidence:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: The confidence of the credibility
     TweetAnalysisResult:
       description: >-
         The result of a call of a tweet analysis. It depends on the presence of `callback_url` or not.
         If `callback_url` is provided, the result is a JobCreated object.
         If `callback_url` is not provided, the result is a `TweetCredibility` object.
       oneOf:
-        - $ref: '#/components/schemas/TweetCredibility'
-        - $ref: '#/components/schemas/JobCreated'
+        - $ref: "#/components/schemas/TweetCredibility"
+        - $ref: "#/components/schemas/JobCreated"
     UserAnalysisResult:
       description: >-
         The result of a call of a twitter profile analysis. It depends on the presence of `callback_url` or not.
         If `callback_url` is provided, the result is a JobCreated object.
         If `callback_url` is not provided, the result is a `UserCredibility` object.
       oneOf:
-        - $ref: '#/components/schemas/UserCredibility'
-        - $ref: '#/components/schemas/JobCreated'
+        - $ref: "#/components/schemas/UserCredibility"
+        - $ref: "#/components/schemas/JobCreated"
     SourceAnalysisResult:
       description: >-
         The result of a call of a source analysis. It depends on the presence of `callback_url` or not.
         If `callback_url` is provided, the result is a `JobCreated` object.
         If `callback_url` is not provided, the result is a `SourceCredibility` object.
       oneOf:
-        - $ref: '#/components/schemas/SourceCredibility'
-        - $ref: '#/components/schemas/JobCreated'
+        - $ref: "#/components/schemas/SourceCredibility"
+        - $ref: "#/components/schemas/JobCreated"
     UrlUnshortenedResult:
       description: >-
         The result of a call to the unshortening endpoint. It provides the URL unshortened in the field `url_full`
@@ -258,12 +271,26 @@ components:
         - url
         - url_full
       properties:
-          url:
-            type: string
-            description: The requested URL
-          url_full:
-            type: string
-            format: uri
-            minimum: 0.0
-            maximum: 1.0
-            description: The unshortened URL
+        url:
+          type: string
+          description: The requested URL
+        url_full:
+          type: string
+          format: uri
+          minimum: 0.0
+          maximum: 1.0
+          description: The unshortened URL
+    StatusResult:
+      description: >-
+        The result of a call to the health status endpoint. It provides the overall status and the details of the components
+      type: object
+      required:
+        - status
+        - details
+      properties:
+        status:
+          type: string
+          description: `ok` if everything is ok, or `error` / `exception` if something is wrong
+        details:
+          type: object
+          description: The status of the components

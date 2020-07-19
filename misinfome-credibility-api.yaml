@@ -1,0 +1,701 @@
+openapi: 3.0.1
+
+info:
+  title: Credibility - Parametrised Credibility API
+  description: >
+    The Credibility API uses continually updated data from fact-checking websites in order to compute the credibility of particular URLs, authors (i.e., Twitter users), publishers (i.e., domains) and assessors (i.e. Fact-Checkers). The credibility API can be parametrised using rulesets.
+  version: "3.0.0a"
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /credibility/assessor:
+    get:
+      summary: Get the credibility of a given assessor (forwards to /credibility/publisher).
+      operationId: credibility.api.credibility.assessor.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: domain
+          in: query
+          description: The domain associated with the assessor that needs to be evaluated.
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+    post:
+      summary: Get the credibility of a given assessor (forwards to /credibility/publisher).
+      operationId: credibility.api.credibility.assessor.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: domain
+          in: query
+          description: The domain associated with the assessor that needs to be evaluated.
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+  /credibility/agent:
+    get:
+      summary: Get the credibility of a given agent (e.g., Twitter account, author, tool, etc.).
+      operationId: credibility.api.credibility.agent.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: url
+          in: query
+          description: The url associated with the agent that needs to be evaluated (e.g., https://twitter.com/realDonaldTrump).
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+    post:
+      summary: Get the credibility of a given agent (e.g., Twitter account, author, tool, etc.).
+      operationId: credibility.api.credibility.agent.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: url
+          in: query
+          description: The url associated with the agent that needs to be evaluated (e.g., https://twitter.com/realDonaldTrump).
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+  /credibility/publisher:
+    get:
+      summary: Get the credibility of a given publisher.
+      operationId: credibility.api.credibility.publisher.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: domain
+          in: query
+          description: The domain associated with the publisher that needs to be evaluated.
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+    post:
+      summary: Get the credibility of a given publisher.
+      operationId: credibility.api.credibility.publisher.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: domain
+          in: query
+          description: The domain associated with the publisher that needs to be evaluated.
+          required: true
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+  /credibility/document:
+    get:
+      summary: Get the credibility of a given document (for URL or for a textual input).
+      operationId: credibility.api.credibility.document.get
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: url
+          in: query
+          description: The url that links to the content that needs to be analysed.
+          required: true
+          schema:
+            type: string
+        - name: agent
+          in: query
+          description: The agent url associated with the document that needs to be evaluated (infered if not set).
+          required: false
+          schema:
+            type: string
+
+        - name: publisher
+          in: query
+          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set).
+          required: false
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+    post:
+      summary: Get the credibility of a given document (for URL or for a textual input).
+      operationId: credibility.api.credibility.document.post
+      responses:
+        200:
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredibilityResponse"
+      parameters:
+        - name: url
+          in: query
+          description: The url that links to the content that needs to be analysed.
+          required: true
+          schema:
+            type: string
+        - name: agent
+          in: query
+          description: The agent url associated with the document that needs to be evaluated (infered if not set).
+          required: false
+          schema:
+            type: string
+        - name: publisher
+          in: query
+          description: The domain associated with the publisher of the document that needs to be evaluated (infered if not set).
+          required: false
+          schema:
+            type: string
+        - name: ruleset_id
+          in: query
+          description: The ruleset identifier.
+          schema:
+            type: string
+        - name: callback_url
+          in: query
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu domain for validation).
+          schema:
+            type: string
+            format: url
+      tags:
+        - Credibility
+
+  /credibility/rulesets:
+    get:
+      operationId: credibility.api.rulesets.get_all
+      summary: Get all the stored rulesets definitions.
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RulesetDefinition"
+      tags:
+        - Credibility Rulesets
+    post:
+      operationId: credibility.api.rulesets.post
+      summary: Create a new credibility ruleset.
+      requestBody:
+        description: The ruleset content.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ruleset"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RulesetListResponse"
+      tags:
+        - Credibility Rulesets
+
+  /credibility/rulesets/{ruleset_id}:
+    get:
+      operationId: credibility.api.rulesets.get
+      summary: Get a ruleset definition.
+      parameters:
+        - name: ruleset_id
+          description: The identifier of the ruleset that needs to be retreived.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RulesetResponse"
+      tags:
+        - Credibility Rulesets
+    put:
+      operationId: credibility.api.rulesets.put
+      summary: Update a ruleset definition.
+      parameters:
+        - name: ruleset_id
+          description: The identifier of the ruleset that needs to be deleted.
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The ruleset content.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ruleset"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RulesetResponse"
+      tags:
+        - Credibility Rulesets
+    delete:
+      operationId: credibility.api.rulesets.delete
+      summary: Delete a ruleset definition.
+      parameters:
+        - name: ruleset_id
+          description: The identifier of the ruleset that needs to be deleted.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+      tags:
+        - Credibility Rulesets
+
+  /jobs/statuses:
+    get:
+      summary: Get the list of running and completed jobs.
+      operationId: credibility.api.jobs.statuses.get_all
+      parameters:
+        - name: query_type
+          in: query
+          description: Filter the jobs by the type of query.
+          required: false
+          schema:
+            type: string
+            enum:
+              - /credibility/assessor
+              - /credibility/agent
+              - /credibility/publisher
+              - /credibility/document
+        - name: status
+          in: query
+          description: Filter the jobs byt their status.
+          required: false
+          schema:
+            type: string
+            enum:
+              - queued
+              - finished
+              - failed
+              - started
+              - deferred
+              - scheduled
+        - name: callback_url
+          in: query
+          description: Filter the jobs by callback_url.
+          required: false
+          schema:
+            type: string
+            format: url
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatusListResponse"
+      tags:
+        - Jobs
+
+  /jobs/statuses/{job_id}:
+    get:
+      summary: Get the status of a given job.
+      operationId: credibility.api.jobs.statuses.get
+      parameters:
+        - name: job_id
+          description: The identifier of the job that needs to be retreived.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobStatusResponse"
+      tags:
+        - Jobs
+
+tags:
+  - name: Credibility
+    description: Obtain credibility for different type of entities.
+  - name: Credibility Rulesets
+    description: Manage the rulesets used for computing the credibility of entities.
+  - name: Jobs
+    description: Obtain processing status for a query.
+
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        status:
+          description: Identifies if the query was successful.
+          type: string
+          enum: [success, fail, error]
+        data:
+          description: The response payload.
+          nullable: true
+        message:
+          description: Explains the response status.
+          type: string
+          nullable: true
+      required:
+        - status
+
+    RuleResponse:
+      description: A ruleset computation response.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                ruleset_id:
+                  description: The ruleset used for the computation.
+                  type: string
+
+    CredibilityValue:
+      description: A credibility value.
+      type: object
+      properties:
+        credibility:
+          description: The credibility score of an entity.
+          type: number
+          minimum: -1
+          maximum: 1
+        confidence:
+          description: The confidence value associated with a result.
+          type: number
+          minimum: 0
+          maximum: 1
+
+    CredibilityTrustValue:
+      description: A credibility and trust value.
+      allOf:
+        - $ref: "#/components/schemas/CredibilityValue"
+        - type: object
+          properties:
+            trust:
+              description: The trust value associated with an entity.
+              type: number
+              minimum: 0
+              maximum: 1
+
+    Credibility:
+      description: A credibility assessment.
+      type: object
+      properties:
+        credibility:
+          $ref: "#/components/schemas/CredibilityValue"
+        query_type:
+          type: string
+          enum:
+            - /credibility/assessor
+            - /credibility/agent
+            - /credibility/publisher
+            - /credibility/document
+
+    CredibilityResponse:
+      description: A Credibility assessment response.
+      allOf:
+        - $ref: "#/components/schemas/RuleResponse"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Credibility"
+
+    JobStatus:
+      description: A job status.
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - queued
+            - finished
+            - failed
+            - started
+            - deferred
+            - scheduled
+        progress:
+          description: The progress of the computation.
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        query_type:
+          type: string
+          enum:
+            - /credibility/assessor
+            - /credibility/agent
+            - /credibility/publisher
+            - /credibility/document
+            - /rulesets
+        result:
+          $ref: "#/components/schemas/CredibilityResponse"
+        callback_url:
+          type: string
+          format: url
+
+    JobStatusResponse:
+      description: A job status response.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/JobStatus"
+
+    JobStatusListResponse:
+      description: A list of Job statuses.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: An list of job statuses.
+              type: array
+              items:
+                $ref: "#/components/schemas/JobStatus"
+
+    Initialiser:
+      description: An initial value.
+      type: object
+      properties:
+        entity_type:
+          type: string
+          enum:
+            - assessor
+            - publisher
+            - agent
+            - document
+        id:
+          type: string
+        name:
+          type: string
+        value:
+          $ref: "#/components/schemas/CredibilityTrustValue"
+
+    ParametrisedMergeRule:
+      description: A parametrised merge rule.
+      type: object
+      properties:
+        thresholds:
+          type: array
+          items:
+            type: number
+        weights:
+          type: array
+          items:
+            type: number
+
+    Ruleset:
+      description: A ruleset definition.
+      type: object
+      properties:
+        name:
+          description: The name of the ruleset.
+          type: string
+        author:
+          description: The name the creator of the ruleset.
+          type: string
+        version:
+          description: The version of the ruleset.
+          type: string
+        description:
+          description: The decription of the ruleset.
+          type: string
+        model:
+          description: The type of model used for computing the credibility score.
+          enum:
+            - legacy
+            - graph
+        #   default: graph
+        initialisers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Initialiser"
+        default:
+          $ref: "#/components/schemas/CredibilityTrustValue"
+        #emit_rules: Not implemented.
+        merge_rules:
+          type: object
+          properties:
+            assessor:
+              $ref: "#/components/schemas/ParametrisedMergeRule"
+            publisher:
+              $ref: "#/components/schemas/ParametrisedMergeRule"
+            agent:
+              $ref: "#/components/schemas/ParametrisedMergeRule"
+            document:
+              $ref: "#/components/schemas/ParametrisedMergeRule"
+
+    RulesetDefinition:
+      description: A ruleset definition.
+      allOf:
+        - $ref: "#/components/schemas/Ruleset"
+        - type: object
+          properties:
+            id:
+              type: string
+              description: The ruleset identifier.
+
+    RulesetResponse:
+      description: A ruleset definition response.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RulesetDefinition"
+
+    RulesetListResponse:
+      description: A list of rulesets.
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              description: A list of job rulesets.
+              type: array
+              items:
+                $ref: "#/components/schemas/RulesetDefinition"
