@@ -145,6 +145,19 @@ paths:
       tags:
         - utils
 
+"/utils/status":
+    get:
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResult"
+      description: Get the health status of the service to know if everything is working properly
+      tags:
+        - utils
+
 tags:
   - name: credibility
     description: >-
@@ -267,3 +280,17 @@ components:
           minimum: 0.0
           maximum: 1.0
           description: The unshortened URL
+    StatusResult:
+      description: >-
+        The result of a call to the health status endpoint. It provides the overall status and the details of the components
+      type: object
+      required:
+        - status
+        - details
+      properties:
+        status:
+          type: string
+          description: `ok` if everything is ok, or `error` / `exception` if something is wrong
+        details:
+          type: object
+          description: The status of the components
