@@ -202,9 +202,16 @@ components:
       type: object
       required:
         - credibility
+        - itemReviewed
+        - explanation_link
       properties:
         credibility:
           $ref: "#/components/schemas/Credibility"
+        itemReviewed:
+          type: string
+        explanation_link:
+          type: string
+          format: url
     UserCredibility:
       description: The credibility assigned to a User (just twitter)
       type: object
