@@ -203,15 +203,16 @@ components:
       required:
         - credibility
         - itemReviewed
-        - explanation_link
+        - ratingExplanation
       properties:
         credibility:
           $ref: "#/components/schemas/Credibility"
         itemReviewed:
           type: string
-        explanation_link:
+        ratingExplanation:
           type: string
           format: url
+          description: The explaination as URL to MisinfoMe frontend
     UserCredibility:
       description: The credibility assigned to a User (just twitter)
       type: object
