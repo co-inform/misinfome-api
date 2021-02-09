@@ -163,7 +163,7 @@ paths:
       responses:
         "200":
           description: Success
-      description: Get the full URL for common shortening domains (bit.ly / t.co / ...)
+      description: Endpoint to get the latest data release
     parameters:
       - name: file_name
         in: query
