@@ -342,6 +342,7 @@ components:
         - claim_reviews
         - tweet_reviews
         - files
+        - date
       properties:
         scrapers_stats:
           type: object
@@ -354,6 +355,9 @@ components:
           $ref: "#/components/schemas/TweetReviewsStats"
         files:
           $ref: "#/components/schemas/FilesStats"
+        date:
+          type: string
+          description: The date of collection, in the format YYYY_MM_DD
     ClaimReviewsStats:
       type: object
       description: Statistics about the ClaimReviews collected.
