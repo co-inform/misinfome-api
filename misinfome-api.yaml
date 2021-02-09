@@ -158,6 +158,29 @@ paths:
       tags:
         - utils
 
+  "data/latest":
+    parameters:
+      - name: file_name
+        in: query
+        required: false
+        schema:
+          type: string
+        description: >-
+          This parameter allows to download the files of the daily release. With value `zip`, the full daily collection is downloaded.
+          With other values, e.g. `tweet_reviews`, only the tweet reviews are downloaded.
+          The full list of valid values can be seen by doing a request to this endpoint without the `file_name` parameter, and looking at the keys of the `files` object in the response.
+          Keep in mind that the `zip` is compressed while the singular files are not compressed, so download times may be longer for uncompressed.
+    description: >-
+      The data API allows to retrieve the latest release of the daily collection of misinformation.
+      With "daily" we mean that it is updated regularly every day and the results accumulate over time.
+      Some new fact-checks appear every day and others may disappear. The files does not only contain the reviews for the last day.
+
+      The data provided comes under different files, which can be requested with the `file_name` parameter.
+      The available file names can be seen in the response `files` dictionary, which is a mapping between the `file_name` and the real file path (used internally).
+
+      If the `file_name` parameter is absent, general information about the release are provided (see the DailyStats data structure)
+    tags:
+      - data
 tags:
   - name: credibility
     description: >-
@@ -169,6 +192,9 @@ tags:
     description: Query the status of the jobs
   - name: utils
     description: Utilities
+  - name: data
+    description: Endpoints for downloading the datasets
+
 components:
   schemas:
     JobCreated:
@@ -302,3 +328,103 @@ components:
         details:
           type: object
           description: The status of the components
+    DailyStats:
+      description: >-
+        This object provides the information of the daily dataset
+      type: object
+      required:
+        - scrapers_stats
+        - claim_reviews
+        - tweet_reviews
+        - files
+      properties:
+        scrapers_stats:
+          type: object
+          description: >-
+            Details about the scrapers that have been run for this day, with the number of items collected.
+            It is a map of `scraper_name` -> `len(claim_reviews_raw)`
+        claim_reviews:
+          $ref: "#/components/schemas/ClaimReviewsStats"
+        tweet_reviews:
+          $ref: "#/components/schemas/TweetReviewsStats"
+        files:
+          $ref: "#/components/schemas/FilesStats"
+    ClaimReviewsStats:
+      type: object
+      description: Statistics about the ClaimReviews collected.
+      required:
+        - claimreviews_merged_count
+        - raw_claimreviews_count
+        - ifcn_domains_count
+        - claimreviews_unique_review_urls_count
+        - not_matching_reviews_labels_count
+        - links_not_credible_count
+      properties:
+        claimreviews_merged_count:
+          type: integer
+          description: The final number of merged ClaimReviews (available in `claim_reviews.json`). ClaimReviews are merged if they have the same review URL and an almost identical reviewed claim. For this reason, the `claimreviews_unique_review_urls_count`  is smaller.
+        raw_claimreviews_count:
+          type: integer
+          description: The number of original ClaimReviews (available in `raw_claim_reviews.json`) without doing any processing, merging and without recognising duplicates. Multiple collectors may provide the same ClaimReview
+        ifcn_domains_count:
+          type: integer
+          description: The number of IFCN domains that has been used for filtering out untrustworthy ClaimReviews (available in `ifcn_domains.json`).
+        claimreviews_unique_review_urls_count:
+          type: integer
+          description: The total of distinct URLs where fact-checks are published
+        not_matching_reviews_labels_count:
+          type: integer
+          description: The number of merged ClaimReviews which have problems matching with a single Co-Inform label. They have the label `check_me` in the file `claim_reviews.json`
+        links_not_credible_count:
+          type: integer
+          description: The total of links that have the `not_credible` label. They are available as a list in `links_not_credible.json` and their full details are in `links_not_credible_full.json`
+    TweetReviewsStats:
+      type: object
+      description: Statistics about the Tweet reviews collected. A Tweet review happens when a ClaimReview is listing a Tweet in the appearances of a claimm
+      required:
+        - tweet_reviews_count
+        - error_twitter_api_count
+        - tweets_with_disagreeing_reviews_count
+      properties:
+        tweet_reviews_count:
+          type: integer
+          description: The number of tweets reviewed by fact-checkers through ClaimReview
+        error_twitter_api_count:
+          type: integer
+          description: The number of tweets that were not possible to retreive due to API errors (deleted or blocked tweets).
+        tweets_with_disagreeing_reviews_count:
+          type: integer
+          description: The number of tweets that have a `check_me` label. This happens because multiple reviews with different labels exist.
+    FilesStats:
+      type: object
+      description: The files available to download. Use the keys of this dictionary in the `file_name` parameter in order to download the file.
+      required:
+        - ifcn_sources
+        - claim_reviews_raw
+        - claim_reviews
+        - links_not_credible
+        - links_not_credible_full
+        - tweet_reviews
+        - zip
+      properties:
+        ifcn_sources:
+          type: integer
+          description: The file containing the details about the IFCN signatories
+        claim_reviews_raw:
+          type: integer
+          description: The file containing the unprocessed, unmerged ClaimReviews
+        claim_reviews:
+          type: integer
+          description: The file containing the processed ClaimReviews
+        links_not_credible:
+          type: integer
+          description: The list of misinforming URLs.
+        links_not_credible_full:
+          type: integer
+          description: The details (fact-checker name, fact-checking URL, date, original label) about the misinforming URLs
+        tweet_reviews:
+          type: integer
+          description: The extracted tweet reviews
+        zip:
+          type: integer
+          description: The full archive, with inside all the files
