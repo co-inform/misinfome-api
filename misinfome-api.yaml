@@ -163,7 +163,17 @@ paths:
       responses:
         "200":
           description: Success
-      description: Endpoint to get the latest data release
+      description: >-
+        The data API allows to retrieve the latest release of the daily collection of misinformation.
+        With "daily" we mean that it is updated regularly every day and the results accumulate over time.
+        Some new fact-checks appear every day and others may disappear. The files does not only contain the reviews for the last day.
+
+        The data provided comes under different files, which can be requested with the `file_name` parameter.
+        The available file names can be seen in the response `files` dictionary, which is a mapping between the `file_name` and the real file path (used internally).
+
+        If the `file_name` parameter is absent, general information about the release are provided (see the DailyStats data structure)
+      tags:
+        - data
     parameters:
       - name: file_name
         in: query
@@ -175,17 +185,7 @@ paths:
           With other values, e.g. `tweet_reviews`, only the tweet reviews are downloaded.
           The full list of valid values can be seen by doing a request to this endpoint without the `file_name` parameter, and looking at the keys of the `files` object in the response.
           Keep in mind that the `zip` is compressed while the singular files are not compressed, so download times may be longer for uncompressed.
-    description: >-
-      The data API allows to retrieve the latest release of the daily collection of misinformation.
-      With "daily" we mean that it is updated regularly every day and the results accumulate over time.
-      Some new fact-checks appear every day and others may disappear. The files does not only contain the reviews for the last day.
 
-      The data provided comes under different files, which can be requested with the `file_name` parameter.
-      The available file names can be seen in the response `files` dictionary, which is a mapping between the `file_name` and the real file path (used internally).
-
-      If the `file_name` parameter is absent, general information about the release are provided (see the DailyStats data structure)
-    tags:
-      - data
 tags:
   - name: credibility
     description: >-
