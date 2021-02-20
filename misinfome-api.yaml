@@ -4,7 +4,7 @@ servers:
     description: The deployment server
   - url: https://misinfo.me/misinfo/api/
     description: The deployment with the custom domain
-  - url: http://localhost:5000/misinfo/api
+  - url: http://localhost:5000/misinfo/api/
     description: localhost
 info:
   title: MisinfoMe API
@@ -185,6 +185,89 @@ paths:
           With other values, e.g. `tweet_reviews`, only the tweet reviews are downloaded.
           The full list of valid values can be seen by doing a request to this endpoint without the `file_name` parameter, and looking at the keys of the `files` object in the response.
           Keep in mind that the `zip` is compressed while the singular files are not compressed, so download times may be longer for uncompressed.
+
+  "/data/sample":
+    get:
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SampleResult"
+      description: >-
+        Get a random sample of misinformation. The selection is done from the daily release file
+        [`links_not_credible_full.json`](https://misinfo.me/misinfo/api/data/latest?file_name=links_not_credible_full)
+        and therefore includes only misinforming samples with a link.
+      tags:
+        - data
+    parameters:
+      - name: since
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        description: >-
+          Time filter, only get items published since the provided date. Format YYYY-MM-DD
+      - name: until
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^\d{4}-\d{2}-\d{2}$'
+        description: >-
+          Time filter, only get items published until the provided date. Format YYYY-MM-DD
+      - name: misinforming_domain
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^[^/]+$'
+        description: >-
+          The domain where misinformation is published, e.g., breitbart.com
+      - name: fact_checker_domain
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^[^/]+$'
+        description: >-
+          The domain of the factchecker, e.g., snopes.com
+      - name: exclude_misinfo_domain
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            pattern: '^[^/]+$'
+          default:
+            - twitter.com
+            - wikipedia.org
+        description: >-
+          Whether to exclude fact-checked links to some domains.
+          Default is `twitter.com` and `wikipedia.org` (`?exclude_misinfo_domain=twitter.com&exclude_misinfo_domain=wikipedia.org`).
+          It will be discarded if `misinforming_domain` is set.
+      - name: exclude_homepage_url_misinfo
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^[^/]+$'
+        description: >-
+          Whether to exclude fact-checked links that point to a homepage
+          (no specific article, e.g. "https://www.senatemajority.com/"). Default is true.
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: '^[^/]+$'
+        description: >-
+          The cursor to resume sampling. This parameter is needed to avoid repetition of items (birthday paradox)
+          that can happen after a few random extractions. Use every time the value of `next_cursor` of the last request
+          if you want to avoid repeating items. If the parameter is missing, the random sampling won't be conditioned.
 
 tags:
   - name: credibility
@@ -437,3 +520,26 @@ components:
         zip:
           type: integer
           description: The full archive, with inside all the files
+    SampleResult:
+      description: >-
+        The result of random sampling from the dataset of misinformation.
+      type: object
+      required:
+        - sample
+        - index
+        - next_cursor
+        - current_cursor
+      properties:
+        sample:
+          $ref: "#/components/schemas/Sample"
+        index:
+          type: integer
+          description: >-
+            The index of the current sample inside the file
+            [`links_not_credible_full.json`](https://misinfo.me/misinfo/api/data/latest?file_name=links_not_credible_full)
+        next_cursor:
+          type: integer
+          description: The value to use for the next call at this endpoint if you want to avoid repetitions
+        current_cursor:
+          type: integer
+          description: The value of cursor that was used for this sampling (debugging purposes)
