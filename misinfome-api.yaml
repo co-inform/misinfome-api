@@ -38,6 +38,31 @@ paths:
             format: url
       tags:
         - credibility
+  /credibility/urls:
+    post:
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UrlAnalysisResult"
+      description: Get the credibility of a certain Url
+      parameters:
+        - in: query
+          name: url
+          description: The URL to analyse
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: callback_url
+          description: A URL to be POSTed with the result of the job (must include api.coinform.eu/ for validation)
+          schema:
+            type: string
+            format: url
+      tags:
+        - credibility
   "/credibility/tweets/{tweet_id}":
     parameters:
       - in: path
@@ -311,6 +336,7 @@ components:
         - $ref: "#/components/schemas/TweetCredibility"
         - $ref: "#/components/schemas/UserCredibility"
         - $ref: "#/components/schemas/SourceCredibility"
+        - $ref: "#/components/schemas/UrlCredibility"
     TweetCredibility:
       description: The credibility assigned to a tweet
       type: object
@@ -329,6 +355,14 @@ components:
           description: The explaination as URL to MisinfoMe frontend
     UserCredibility:
       description: The credibility assigned to a User (just twitter)
+      type: object
+      required:
+        - credibility
+      properties:
+        credibility:
+          $ref: "#/components/schemas/Credibility"
+    UrlCredibility:
+      description: The credibility assigned to a Url
       type: object
       required:
         - credibility
@@ -384,6 +418,14 @@ components:
         If `callback_url` is not provided, the result is a `SourceCredibility` object.
       oneOf:
         - $ref: "#/components/schemas/SourceCredibility"
+        - $ref: "#/components/schemas/JobCreated"
+    UrlAnalysisResult:
+      description: >-
+        The result of a call of a url analysis. It depends on the presence of `callback_url` or not.
+        If `callback_url` is provided, the result is a `JobCreated` object.
+        If `callback_url` is not provided, the result is a `UrlCredibility` object.
+      oneOf:
+        - $ref: "#/components/schemas/UrlCredibility"
         - $ref: "#/components/schemas/JobCreated"
     UrlUnshortenedResult:
       description: >-
